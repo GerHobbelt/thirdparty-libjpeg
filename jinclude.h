@@ -46,6 +46,10 @@
 
 #include <stdio.h>
 
+#if defined(_MSC_VER)
+#include <crtdbg.h>
+#endif
+
 /*
  * We need memory copying and zeroing functions, plus strncpy().
  * ANSI and System V implementations declare these in <string.h>.
