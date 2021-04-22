@@ -426,8 +426,13 @@ print_text_marker (j_decompress_ptr cinfo)
  * The main program.
  */
 
+#if defined(MAIN_IS_MONOLITHIC)
 int
-main (int argc, char **argv)
+djpeg_main(int argc, char** argv)
+#else
+int
+main(int argc, char** argv)
+#endif
 {
   struct jpeg_decompress_struct cinfo;
   struct jpeg_error_mgr jerr;

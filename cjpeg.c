@@ -515,8 +515,13 @@ parse_switches (j_compress_ptr cinfo, int argc, char **argv,
  * The main program.
  */
 
+#if defined(MAIN_IS_MONOLITHIC)
 int
-main (int argc, char **argv)
+cjpeg_main(int argc, char** argv)
+#else
+int
+main(int argc, char** argv)
+#endif
 {
   struct jpeg_compress_struct cinfo;
   struct jpeg_error_mgr jerr;

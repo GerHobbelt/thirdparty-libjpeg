@@ -410,8 +410,13 @@ keymatch (char * arg, const char * keyword, int minchars)
  * The main program.
  */
 
+#if defined(MAIN_IS_MONOLITHIC)
 int
-main (int argc, char **argv)
+wrjpegcom_main(int argc, char** argv)
+#else
+int
+main(int argc, char** argv)
+#endif
 {
   int argn;
   char * arg;
