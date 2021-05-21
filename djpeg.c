@@ -426,7 +426,7 @@ print_text_marker (j_decompress_ptr cinfo)
  * The main program.
  */
 
-#if defined(MAIN_IS_MONOLITHIC)
+#if defined(BUILD_MONOLITHIC)
 int
 djpeg_main(int argc, char** argv)
 #else

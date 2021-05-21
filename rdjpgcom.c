@@ -452,7 +452,7 @@ keymatch (const char * arg, const char * keyword, int minchars)
  * The main program.
  */
 
-#if defined(MAIN_IS_MONOLITHIC)
+#if defined(BUILD_MONOLITHIC)
 int
 rdjpegcom_main(int argc, char** argv)
 #else

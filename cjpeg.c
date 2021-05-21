@@ -515,7 +515,7 @@ parse_switches (j_compress_ptr cinfo, int argc, char **argv,
  * The main program.
  */
 
-#if defined(MAIN_IS_MONOLITHIC)
+#if defined(BUILD_MONOLITHIC)
 int
 cjpeg_main(int argc, char** argv)
 #else
