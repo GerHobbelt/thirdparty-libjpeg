@@ -453,15 +453,13 @@ keymatch (const char * arg, const char * keyword, int minchars)
  */
 
 #if defined(BUILD_MONOLITHIC)
-int
-rdjpegcom_main(int argc, char** argv)
-#else
-int
-main(int argc, char** argv)
+#define main(cnt, arr)      rdjpegcom_main(cnt, arr)
 #endif
+
+int main(int argc, const char** argv)
 {
   int argn;
-  char * arg;
+  const char * arg;
   int verbose = 0, raw = 0;
 
   /* On Mac, fetch a command line. */

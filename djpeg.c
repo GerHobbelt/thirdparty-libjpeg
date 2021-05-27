@@ -84,7 +84,7 @@ static IMAGE_FORMATS requested_fmt;
 
 
 static const char * progname;	/* program name for error messages */
-static char * outfilename;	/* for -outfile switch */
+static const char * outfilename;	/* for -outfile switch */
 
 
 LOCAL(void)
@@ -161,7 +161,7 @@ usage (void)
 
 
 LOCAL(int)
-parse_switches (j_decompress_ptr cinfo, int argc, char **argv,
+parse_switches (j_decompress_ptr cinfo, int argc, const char **argv,
 		int last_file_arg_seen, boolean for_real)
 /* Parse optional switches.
  * Returns argv[] index of first file-name argument (== argc if none).
@@ -173,7 +173,7 @@ parse_switches (j_decompress_ptr cinfo, int argc, char **argv,
  */
 {
   int argn;
-  char * arg;
+  const char * arg;
 
   /* Set up default JPEG parameters. */
   requested_fmt = DEFAULT_FMT;	/* set default output file format */
@@ -427,12 +427,10 @@ print_text_marker (j_decompress_ptr cinfo)
  */
 
 #if defined(BUILD_MONOLITHIC)
-int
-djpeg_main(int argc, char** argv)
-#else
-int
-main(int argc, char** argv)
+#define main(cnt, arr)      djpeg_main(cnt, arr)
 #endif
+
+int main(int argc, const char** argv)
 {
   struct jpeg_decompress_struct cinfo;
   struct jpeg_error_mgr jerr;

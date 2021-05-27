@@ -135,7 +135,7 @@ select_file_type (j_compress_ptr cinfo, FILE * infile)
 
 
 static const char * progname;	/* program name for error messages */
-static char * outfilename;	/* for -outfile switch */
+static const char * outfilename;	/* for -outfile switch */
 
 
 LOCAL(void)
@@ -209,7 +209,7 @@ usage (void)
 
 
 LOCAL(int)
-parse_switches (j_compress_ptr cinfo, int argc, char **argv,
+parse_switches (j_compress_ptr cinfo, int argc, const char **argv,
 		int last_file_arg_seen, boolean for_real)
 /* Parse optional switches.
  * Returns argv[] index of first file-name argument (== argc if none).
@@ -221,14 +221,14 @@ parse_switches (j_compress_ptr cinfo, int argc, char **argv,
  */
 {
   int argn;
-  char * arg;
+  const char * arg;
   boolean force_baseline;
   boolean simple_progressive;
-  char * qualityarg = NULL;	/* saves -quality parm if any */
-  char * qtablefile = NULL;	/* saves -qtables filename if any */
-  char * qslotsarg = NULL;	/* saves -qslots parm if any */
-  char * samplearg = NULL;	/* saves -sample parm if any */
-  char * scansarg = NULL;	/* saves -scans parm if any */
+  const char * qualityarg = NULL;	/* saves -quality parm if any */
+  const char * qtablefile = NULL;	/* saves -qtables filename if any */
+  const char * qslotsarg = NULL;	/* saves -qslots parm if any */
+  const char * samplearg = NULL;	/* saves -sample parm if any */
+  const char * scansarg = NULL;	/* saves -scans parm if any */
 
   /* Set up default JPEG parameters. */
 
@@ -516,12 +516,10 @@ parse_switches (j_compress_ptr cinfo, int argc, char **argv,
  */
 
 #if defined(BUILD_MONOLITHIC)
-int
-cjpeg_main(int argc, char** argv)
-#else
-int
-main(int argc, char** argv)
+#define main(cnt, arr)      cjpeg_main(cnt, arr)
 #endif
+
+int main(int argc, const char** argv)
 {
   struct jpeg_compress_struct cinfo;
   struct jpeg_error_mgr jerr;

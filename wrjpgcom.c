@@ -411,15 +411,13 @@ keymatch (const char * arg, const char * keyword, int minchars)
  */
 
 #if defined(BUILD_MONOLITHIC)
-int
-wrjpegcom_main(int argc, char** argv)
-#else
-int
-main(int argc, char** argv)
+#define main(cnt, arr)      wrjpegcom_main(cnt, arr)
 #endif
+
+int main(int argc, const char** argv)
 {
   int argn;
-  char * arg;
+  const char * arg;
   int keep_COM = 1;
   char * comment_arg = NULL;
   FILE * comment_file = NULL;
@@ -451,12 +449,11 @@ main(int argc, char** argv)
       }
     } else if (keymatch(arg, "comment", 1)) {
       if (++argn >= argc) usage();
-      comment_arg = argv[argn];
+      comment_arg = strdup(argv[argn]);
       /* If the comment text starts with '"', then we are probably running
        * under MS-DOG and must parse out the quoted string ourselves.  Sigh.
        */
       if (comment_arg[0] == '"') {
-	comment_arg = (char *) malloc((size_t) MAX_COM_LENGTH);
 	if (comment_arg == NULL)
 	  ERREXIT("Insufficient memory");
 	if (strlen(argv[argn]+1) >= (size_t) MAX_COM_LENGTH) {

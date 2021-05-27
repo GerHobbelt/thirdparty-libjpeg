@@ -36,8 +36,8 @@
 
 
 static const char * progname;	/* program name for error messages */
-static char * outfilename;	/* for -outfile switch */
-static char * scaleoption;	/* -scale switch */
+static const char * outfilename;	/* for -outfile switch */
+static const char * scaleoption;	/* -scale switch */
 static JCOPY_OPTION copyoption;	/* -copy switch */
 static jpeg_transform_info transformoption; /* image transformation options */
 
@@ -121,7 +121,7 @@ select_transform(JXFORM_CODE transform)
 
 
 LOCAL(int)
-parse_switches(j_compress_ptr cinfo, int argc, char** argv,
+parse_switches(j_compress_ptr cinfo, int argc, const char** argv,
 	int last_file_arg_seen, boolean for_real)
 	/* Parse optional switches.
 	 * Returns argv[] index of first file-name argument (== argc if none).
@@ -133,9 +133,9 @@ parse_switches(j_compress_ptr cinfo, int argc, char** argv,
 	 */
 {
 	int argn;
-	char* arg;
+	const char* arg;
 	boolean simple_progressive;
-	char* scansarg = NULL;	/* saves -scans parm if any */
+	const char* scansarg = NULL;	/* saves -scans parm if any */
 
 	/* Set up default JPEG parameters. */
 	simple_progressive = FALSE;
@@ -436,12 +436,10 @@ parse_switches(j_compress_ptr cinfo, int argc, char** argv,
  */
 
 #if defined(BUILD_MONOLITHIC)
-int
-jpegtran_main(int argc, char** argv)
-#else
-int
-main(int argc, char** argv)
+#define main(cnt, arr)      jpegtran_main(cnt, arr)
 #endif
+
+int main(int argc, const char** argv)
 {
 	struct jpeg_decompress_struct srcinfo;
 	struct jpeg_compress_struct dstinfo;
