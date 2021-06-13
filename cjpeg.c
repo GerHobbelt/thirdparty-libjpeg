@@ -521,13 +521,13 @@ parse_switches (j_compress_ptr cinfo, int argc, const char **argv,
 
 int main(int argc, const char** argv)
 {
-  struct jpeg_compress_struct cinfo;
-  struct jpeg_error_mgr jerr;
+	struct jpeg_compress_struct cinfo = { 0 };
+  struct jpeg_error_mgr jerr = { 0 };
 #ifdef PROGRESS_REPORT
   struct cdjpeg_progress_mgr progress;
 #endif
   int file_index;
-  cjpeg_source_ptr src_mgr;
+  cjpeg_source_ptr src_mgr = { 0 };
   FILE * input_file;
   FILE * output_file;
   JDIMENSION num_scanlines;

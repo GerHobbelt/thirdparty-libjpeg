@@ -441,11 +441,11 @@ parse_switches(j_compress_ptr cinfo, int argc, const char** argv,
 
 int main(int argc, const char** argv)
 {
-	struct jpeg_decompress_struct srcinfo;
-	struct jpeg_compress_struct dstinfo;
-	struct jpeg_error_mgr jsrcerr, jdsterr;
+	struct jpeg_decompress_struct srcinfo = { 0 };
+	struct jpeg_compress_struct dstinfo = { 0 };
+	struct jpeg_error_mgr jsrcerr, jdsterr = { 0 };
 #ifdef PROGRESS_REPORT
-	struct cdjpeg_progress_mgr progress;
+	struct cdjpeg_progress_mgr progress = { 0 };
 #endif
 	jvirt_barray_ptr* src_coef_arrays;
 	jvirt_barray_ptr* dst_coef_arrays;
