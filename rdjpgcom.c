@@ -515,6 +515,5 @@ int main(int argc, const char** argv)
   (void) scan_JPEG_header(verbose, raw);
 
   /* All done. */
-  exit(EXIT_SUCCESS);
-  return 0;			/* suppress no-return-value warnings */
+  return EXIT_SUCCESS;
 }

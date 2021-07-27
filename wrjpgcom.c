@@ -590,12 +590,11 @@ int main(int argc, const char** argv)
     }
   }
   /* Duplicate the remainder of the source file.
-   * Note that any COM markers occuring after SOF will not be touched.
+   * Note that any COM markers occurring after SOF will not be touched.
    */
   write_marker(marker);
   copy_rest_of_file();
 
   /* All done. */
-  exit(EXIT_SUCCESS);
-  return 0;			/* suppress no-return-value warnings */
+  return EXIT_SUCCESS;
 }
