@@ -173,59 +173,55 @@ parse_switches(j_compress_ptr cinfo, int argc, const char** argv,
 			return -1;
 #endif
 
-		}
-		else if (keymatch(arg, "copy", 2)) {
-			/* Select which extra markers to copy. */
+    } else if (keymatch(arg, "copy", 2)) {
+      /* Select which extra markers to copy. */
 			if (++argn >= argc) { 	/* advance to next argument */
 				usage();
 				return -1;
 			}
-			if (keymatch(argv[argn], "none", 1)) {
-				copyoption = JCOPYOPT_NONE;
-			}
-			else if (keymatch(argv[argn], "comments", 1)) {
-				copyoption = JCOPYOPT_COMMENTS;
-			}
-			else if (keymatch(argv[argn], "all", 1)) {
-				copyoption = JCOPYOPT_ALL;
+      if (keymatch(argv[argn], "none", 1)) {
+	copyoption = JCOPYOPT_NONE;
+      } else if (keymatch(argv[argn], "comments", 1)) {
+	copyoption = JCOPYOPT_COMMENTS;
+      } else if (keymatch(argv[argn], "all", 1)) {
+	copyoption = JCOPYOPT_ALL;
 			}
 			else {
 				usage();
 				return -1;
 			}
-		}
-		else if (keymatch(arg, "crop", 2)) {
-			/* Perform lossless cropping. */
+    } else if (keymatch(arg, "crop", 2)) {
+      /* Perform lossless cropping. */
 #if TRANSFORMS_SUPPORTED
 			if (++argn >= argc) { 	/* advance to next argument */
 				usage();
 				return -1;
 			}
-			if (transformoption.crop /* reject multiple crop/wipe requests */ ||
-				!jtransform_parse_crop_spec(&transformoption, argv[argn])) {
-				fprintf(stderr, "%s: bogus -crop argument '%s'\n",
-					progname, argv[argn]);
+      if (transformoption.crop /* reject multiple crop/wipe requests */ ||
+	  ! jtransform_parse_crop_spec(&transformoption, argv[argn])) {
+	fprintf(stderr, "%s: bogus -crop argument '%s'\n",
+		progname, argv[argn]);
 				return -1;
-			}
+      }
 #else
 			if (select_transform(JXFORM_NONE) != 0)	/* force an error */
 				return -1;
 #endif
-		}
-		else if (keymatch(arg, "debug", 1) || keymatch(arg, "verbose", 1)) {
-			/* Enable debug printouts. */
-			/* On first -d, print version identification */
-			static boolean printed_version = FALSE;
 
-			if (!printed_version) {
-				fprintf(stderr, "Independent JPEG Group's JPEGTRAN, version %s\n%s\n",
-					JVERSION, JCOPYRIGHT);
-				printed_version = TRUE;
-			}
-			cinfo->err->trace_level++;
-		}
-		else if (keymatch(arg, "flip", 1)) {
-			/* Mirror left-right or top-bottom. */
+    } else if (keymatch(arg, "debug", 1) || keymatch(arg, "verbose", 1)) {
+      /* Enable debug printouts. */
+      /* On first -d, print version identification */
+      static boolean printed_version = FALSE;
+
+      if (! printed_version) {
+	fprintf(stderr, "Independent JPEG Group's JPEGTRAN, version %s\n%s\n",
+		JVERSION, JCOPYRIGHT);
+	printed_version = TRUE;
+      }
+      cinfo->err->trace_level++;
+
+    } else if (keymatch(arg, "flip", 1)) {
+      /* Mirror left-right or top-bottom. */
 			if (++argn >= argc) { 	/* advance to next argument */
 				usage();
 				return -1;
@@ -242,20 +238,19 @@ parse_switches(j_compress_ptr cinfo, int argc, const char** argv,
 					usage();
 					return -1;
 				}
-		}
-		else if (keymatch(arg, "grayscale", 1) || keymatch(arg, "greyscale", 1)) {
-			/* Force to grayscale. */
+    } else if (keymatch(arg, "grayscale", 1) || keymatch(arg, "greyscale",1)) {
+      /* Force to grayscale. */
 #if TRANSFORMS_SUPPORTED
-			transformoption.force_grayscale = TRUE;
+      transformoption.force_grayscale = TRUE;
 #else
 			if (select_transform(JXFORM_NONE) != 0)	/* force an error */
 				return -1;
 #endif
-		}
-		else if (keymatch(arg, "maxmemory", 3)) {
-			/* Maximum memory in Kb (or Mb with 'm'). */
-			long lval;
-			char ch = 'x';
+
+    } else if (keymatch(arg, "maxmemory", 3)) {
+      /* Maximum memory in Kb (or Mb with 'm'). */
+      long lval;
+      char ch = 'x';
 
 			if (++argn >= argc) { 	/* advance to next argument */
 				usage();
@@ -265,66 +260,65 @@ parse_switches(j_compress_ptr cinfo, int argc, const char** argv,
 				usage();
 				return -1;
 			}
-			if (ch == 'm' || ch == 'M')
-				lval *= 1000L;
-			cinfo->mem->max_memory_to_use = lval * 1000L;
-		}
-		else if (keymatch(arg, "optimize", 1) || keymatch(arg, "optimise", 1)) {
-			/* Enable entropy parm optimization. */
+      if (ch == 'm' || ch == 'M')
+	lval *= 1000L;
+      cinfo->mem->max_memory_to_use = lval * 1000L;
+
+    } else if (keymatch(arg, "optimize", 1) || keymatch(arg, "optimise", 1)) {
+      /* Enable entropy parm optimization. */
 #ifdef ENTROPY_OPT_SUPPORTED
-			cinfo->optimize_coding = TRUE;
+      cinfo->optimize_coding = TRUE;
 #else
-			fprintf(stderr, "%s: sorry, entropy optimization was not compiled\n",
-				progname);
+      fprintf(stderr, "%s: sorry, entropy optimization was not compiled\n",
+	      progname);
 			return -1;
 #endif
-		}
-		else if (keymatch(arg, "outfile", 4)) {
-			/* Set output file name. */
+
+    } else if (keymatch(arg, "outfile", 4)) {
+      /* Set output file name. */
 			if (++argn >= argc) { 	/* advance to next argument */
 				usage();
 				return -1;
 			}
-			outfilename = argv[argn];	/* save it away for later use */
-		}
-		else if (keymatch(arg, "perfect", 2)) {
-			/* Fail if there is any partial edge MCUs that the transform can't
-			 * handle. */
-			transformoption.perfect = TRUE;
-		}
-		else if (keymatch(arg, "progressive", 2)) {
-			/* Select simple progressive mode. */
+      outfilename = argv[argn];	/* save it away for later use */
+
+    } else if (keymatch(arg, "perfect", 2)) {
+      /* Fail if there is any partial edge MCUs that the transform can't
+       * handle. */
+      transformoption.perfect = TRUE;
+
+    } else if (keymatch(arg, "progressive", 2)) {
+      /* Select simple progressive mode. */
 #ifdef C_PROGRESSIVE_SUPPORTED
-			simple_progressive = TRUE;
-			/* We must postpone execution until num_components is known. */
+      simple_progressive = TRUE;
+      /* We must postpone execution until num_components is known. */
 #else
-			fprintf(stderr, "%s: sorry, progressive output was not compiled\n",
-				progname);
+      fprintf(stderr, "%s: sorry, progressive output was not compiled\n",
+	      progname);
 			return -1;
 #endif
-		}
-		else if (keymatch(arg, "restart", 1)) {
-			/* Restart interval in MCU rows (or in MCUs with 'b'). */
-			long lval;
-			char ch = 'x';
 
-			if (++argn >= argc)	/* advance to next argument */
-				usage();
-			if (sscanf(argv[argn], "%ld%c", &lval, &ch) < 1)
-				usage();
-			if (lval < 0 || lval > 65535L)
-				usage();
-			if (ch == 'b' || ch == 'B') {
-				cinfo->restart_interval = (unsigned int)lval;
-				cinfo->restart_in_rows = 0; /* else prior '-restart n' overrides me */
-			}
-			else {
-				cinfo->restart_in_rows = (int)lval;
-				/* restart_interval will be computed during startup */
-			}
-		}
-		else if (keymatch(arg, "rotate", 2)) {
-			/* Rotate 90, 180, or 270 degrees (measured clockwise). */
+    } else if (keymatch(arg, "restart", 1)) {
+      /* Restart interval in MCU rows (or in MCUs with 'b'). */
+      long lval;
+      char ch = 'x';
+
+      if (++argn >= argc)	/* advance to next argument */
+	usage();
+      if (sscanf(argv[argn], "%ld%c", &lval, &ch) < 1)
+	usage();
+      if (lval < 0 || lval > 65535L)
+	usage();
+      if (ch == 'b' || ch == 'B') {
+	cinfo->restart_interval = (unsigned int) lval;
+	cinfo->restart_in_rows = 0; /* else prior '-restart n' overrides me */
+      } else {
+	cinfo->restart_in_rows = (int) lval;
+	/* restart_interval will be computed during startup */
+      }
+
+    } else if (keymatch(arg, "rotate", 2)) {
+      /* Rotate 90, 180, or 270 degrees (measured clockwise). */
 			if (++argn >= argc) {		/* advance to next argument */
 				usage();
 				return -1;
@@ -345,76 +339,76 @@ parse_switches(j_compress_ptr cinfo, int argc, const char** argv,
 				usage();
 				return -1;
 			}
-		}
-		else if (keymatch(arg, "scale", 4)) {
-			/* Scale the output image by a fraction M/N. */
+    } else if (keymatch(arg, "scale", 4)) {
+      /* Scale the output image by a fraction M/N. */
 			if (++argn >= argc) { 	/* advance to next argument */
 				usage();
 				return -1;
 			}
-			scaleoption = argv[argn];
-			/* We must postpone processing until decompression startup. */
-		}
-		else if (keymatch(arg, "scans", 1)) {
-			/* Set scan script. */
+      scaleoption = argv[argn];
+      /* We must postpone processing until decompression startup. */
+
+    } else if (keymatch(arg, "scans", 1)) {
+      /* Set scan script. */
 #ifdef C_MULTISCAN_FILES_SUPPORTED
 			if (++argn >= argc) { 	/* advance to next argument */
 				usage();
 				return -1;
 			}
-			scansarg = argv[argn];
-			/* We must postpone reading the file in case -progressive appears. */
+      scansarg = argv[argn];
+      /* We must postpone reading the file in case -progressive appears. */
 #else
-			fprintf(stderr, "%s: sorry, multi-scan output was not compiled\n",
-				progname);
+      fprintf(stderr, "%s: sorry, multi-scan output was not compiled\n",
+	      progname);
 			return -1;
 #endif
-		}
-		else if (keymatch(arg, "transpose", 1)) {
-			/* Transpose (across UL-to-LR axis). */
+
+    } else if (keymatch(arg, "transpose", 1)) {
+      /* Transpose (across UL-to-LR axis). */
 			if (select_transform(JXFORM_TRANSPOSE) != 0)
 				return -1;
-		}
-		else if (keymatch(arg, "transverse", 6)) {
-			/* Transverse transpose (across UR-to-LL axis). */
+
+    } else if (keymatch(arg, "transverse", 6)) {
+      /* Transverse transpose (across UR-to-LL axis). */
 			if (select_transform(JXFORM_TRANSVERSE) != 0)
 				return -1;
-		}
-		else if (keymatch(arg, "trim", 3)) {
-			/* Trim off any partial edge MCUs that the transform can't handle. */
-			transformoption.trim = TRUE;
-		}
-		else if (keymatch(arg, "wipe", 1)) {
+
+    } else if (keymatch(arg, "trim", 3)) {
+      /* Trim off any partial edge MCUs that the transform can't handle. */
+      transformoption.trim = TRUE;
+
+    } else if (keymatch(arg, "wipe", 1)) {
 #if TRANSFORMS_SUPPORTED
 			if (++argn >= argc) { 	/* advance to next argument */
 				usage();
 				return -1;
 			}
-			if (transformoption.crop /* reject multiple crop/wipe requests */ ||
-				!jtransform_parse_crop_spec(&transformoption, argv[argn])) {
-				fprintf(stderr, "%s: bogus -wipe argument '%s'\n",
-					progname, argv[argn]);
+      if (transformoption.crop /* reject multiple crop/wipe requests */ ||
+	  ! jtransform_parse_crop_spec(&transformoption, argv[argn])) {
+	fprintf(stderr, "%s: bogus -wipe argument '%s'\n",
+		progname, argv[argn]);
 				return -1;
-			}
+      }
 			if (select_transform(JXFORM_WIPE) != 0)
 				return -1;
 #else
 			if (select_transform(JXFORM_NONE) != 0)	/* force an error */
 				return -1;
 #endif
-		}
-		else {
+
+    } else {
 			usage();			/* bogus switch */
 			return -1;
-		}
-	}
+    }
+  }
 
-	/* Post-switch-scanning cleanup */
+  /* Post-switch-scanning cleanup */
 
-	if (for_real) {
+  if (for_real) {
+
 #ifdef C_PROGRESSIVE_SUPPORTED
-		if (simple_progressive)	/* process -progressive; -scans can override */
-			jpeg_simple_progression(cinfo);
+    if (simple_progressive)	/* process -progressive; -scans can override */
+      jpeg_simple_progression(cinfo);
 #endif
 
 #ifdef C_MULTISCAN_FILES_SUPPORTED

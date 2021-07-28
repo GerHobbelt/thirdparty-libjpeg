@@ -230,7 +230,6 @@ jpeg_idct_islow (j_decompress_ptr cinfo, jpeg_component_info * compptr,
     /* Even part: reverse the even part of the forward DCT.
      * The rotator is c(-6).
      */
-
     z2 = DEQUANTIZE(inptr[DCTSIZE*0], quantptr[DCTSIZE*0]);
     z3 = DEQUANTIZE(inptr[DCTSIZE*4], quantptr[DCTSIZE*4]);
     z2 <<= CONST_BITS;
@@ -1094,6 +1093,7 @@ jpeg_idct_1x1 (j_decompress_ptr cinfo, jpeg_component_info * compptr,
   quantptr = (ISLOW_MULT_TYPE *) compptr->dct_table;
 
   dcval = DEQUANTIZE(coef_block[0], quantptr[0]);
+  CLAMP_DC(dcval);
   /* Add range center and fudge factor for descale and range-limit. */
   dcval += (((DCTELEM) RANGE_CENTER) << 3) + (1 << 2);
 
@@ -2900,7 +2900,10 @@ jpeg_idct_16x8 (j_decompress_ptr cinfo, jpeg_component_info * compptr,
 	inptr[DCTSIZE*5] == 0 && inptr[DCTSIZE*6] == 0 &&
 	inptr[DCTSIZE*7] == 0) {
       /* AC terms all zero */
-      int dcval = DEQUANTIZE(inptr[DCTSIZE*0], quantptr[DCTSIZE*0]) << PASS1_BITS;
+      int dcval = DEQUANTIZE(inptr[DCTSIZE*0], quantptr[DCTSIZE*0]);
+      if (ctr == DCTSIZE)
+        CLAMP_DC(dcval);
+      dcval <<= PASS1_BITS;
 
       wsptr[DCTSIZE*0] = dcval;
       wsptr[DCTSIZE*1] = dcval;
@@ -4066,6 +4069,7 @@ jpeg_idct_2x1 (j_decompress_ptr cinfo, jpeg_component_info * compptr,
   /* Even part */
 
   tmp0 = DEQUANTIZE(coef_block[0], quantptr[0]);
+  CLAMP_DC(tmp0);
   /* Add range center and fudge factor for final descale and range-limit. */
   tmp0 += (((DCTELEM) RANGE_CENTER) << 3) + (1 << 2);
 
@@ -5221,6 +5225,7 @@ jpeg_idct_1x2 (j_decompress_ptr cinfo, jpeg_component_info * compptr,
   /* Even part */
 
   tmp0 = DEQUANTIZE(coef_block[DCTSIZE*0], quantptr[DCTSIZE*0]);
+  CLAMP_DC(tmp0);
   /* Add range center and fudge factor for final descale and range-limit. */
   tmp0 += (((DCTELEM) RANGE_CENTER) << 3) + (1 << 2);
 
