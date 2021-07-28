@@ -85,7 +85,10 @@ static FILE * outfile;		/* output JPEG file */
 
 
 /* Error exit handler */
-#define ERREXIT(msg)  (fprintf(stderr, "%s\n", msg), exit(EXIT_FAILURE))
+static void ERREXIT(const char* msg) {
+	fprintf(stderr, "%s\n", msg);
+	exit(EXIT_FAILURE);
+}
 
 
 /* Read one byte, testing for EOF */
@@ -376,8 +379,6 @@ usage (void)
   fprintf(stderr, "You must specify an input JPEG file name when supplying\n");
   fprintf(stderr, "comment text from standard input.\n");
 #endif
-
-  exit(EXIT_FAILURE);
 }
 
 
@@ -419,7 +420,7 @@ int main(int argc, const char** argv)
   int argn;
   const char * arg;
   int keep_COM = 1;
-  char * comment_arg = NULL;
+  const char * comment_str = NULL;
   FILE * comment_file = NULL;
   unsigned int comment_length = 0;
   int marker;
@@ -442,26 +443,34 @@ int main(int argc, const char** argv)
     if (keymatch(arg, "replace", 1)) {
       keep_COM = 0;
     } else if (keymatch(arg, "cfile", 2)) {
-      if (++argn >= argc) usage();
+		if (++argn >= argc) {
+			usage();
+			return EXIT_FAILURE;
+		}
       if ((comment_file = fopen(argv[argn], "r")) == NULL) {
 	fprintf(stderr, "%s: can't open %s\n", progname, argv[argn]);
-	exit(EXIT_FAILURE);
+	return (EXIT_FAILURE);
       }
     } else if (keymatch(arg, "comment", 1)) {
-      if (++argn >= argc) usage();
-      comment_arg = strdup(argv[argn]);
+		if (++argn >= argc) {
+			usage();
+			return EXIT_FAILURE;
+		}
+      comment_str = argv[argn];
       /* If the comment text starts with '"', then we are probably running
        * under MS-DOG and must parse out the quoted string ourselves.  Sigh.
        */
-      if (comment_arg[0] == '"') {
+      if (comment_str[0] == '"') {
+	char *comment_arg = (char *) malloc((size_t) MAX_COM_LENGTH);
 	if (comment_arg == NULL)
 	  ERREXIT("Insufficient memory");
-	if (strlen(argv[argn]+1) >= (size_t) MAX_COM_LENGTH) {
+	if (strlen(comment_str+1) >= (size_t) MAX_COM_LENGTH) {
 	  fprintf(stderr, "Comment text may not exceed %u bytes\n",
 		  (unsigned int) MAX_COM_LENGTH);
-	  exit(EXIT_FAILURE);
+	  return (EXIT_FAILURE);
 	}
-	strcpy(comment_arg, argv[argn]+1);
+	strcpy(comment_arg, comment_str+1);
+	comment_str = comment_arg;
 	for (;;) {
 	  comment_length = (unsigned int) strlen(comment_arg);
 	  if (comment_length > 0 && comment_arg[comment_length-1] == '"') {
@@ -474,35 +483,42 @@ int main(int argc, const char** argv)
 	      (size_t) MAX_COM_LENGTH) {
 	    fprintf(stderr, "Comment text may not exceed %u bytes\n",
 		    (unsigned int) MAX_COM_LENGTH);
-	    exit(EXIT_FAILURE);
+		return (EXIT_FAILURE);
 	  }
 	  strcat(comment_arg, " ");
 	  strcat(comment_arg, argv[argn]);
 	}
-      } else if (strlen(comment_arg) >= (size_t) MAX_COM_LENGTH) {
+      } else if (strlen(comment_str) >= (size_t) MAX_COM_LENGTH) {
 	fprintf(stderr, "Comment text may not exceed %u bytes\n",
 		(unsigned int) MAX_COM_LENGTH);
-	exit(EXIT_FAILURE);
+	return (EXIT_FAILURE);
       }
-      comment_length = (unsigned int) strlen(comment_arg);
-    } else
-      usage();
+      comment_length = (unsigned int) strlen(comment_str);
+	}
+	else {
+		usage();
+		return EXIT_FAILURE;
+	}
   }
 
   /* Cannot use both -comment and -cfile. */
-  if (comment_arg != NULL && comment_file != NULL)
-    usage();
+  if (comment_str != NULL && comment_file != NULL) {
+	  usage();
+	  return EXIT_FAILURE;
+  }
   /* If there is neither -comment nor -cfile, we will read the comment text
    * from stdin; in this case there MUST be an input JPEG file name.
    */
-  if (comment_arg == NULL && comment_file == NULL && argn >= argc)
-    usage();
+  if (comment_str == NULL && comment_file == NULL && argn >= argc) {
+	  usage();
+	  return EXIT_FAILURE;
+  }
 
   /* Open the input file. */
   if (argn < argc) {
     if ((infile = fopen(argv[argn], READ_BINARY)) == NULL) {
       fprintf(stderr, "%s: can't open %s\n", progname, argv[argn]);
-      exit(EXIT_FAILURE);
+	  return (EXIT_FAILURE);
     }
   } else {
     /* default input file is stdin */
@@ -512,7 +528,7 @@ int main(int argc, const char** argv)
 #ifdef USE_FDOPEN		/* need to re-open in binary mode? */
     if ((infile = fdopen(fileno(stdin), READ_BINARY)) == NULL) {
       fprintf(stderr, "%s: can't open stdin\n", progname);
-      exit(EXIT_FAILURE);
+	  return (EXIT_FAILURE);
     }
 #else
     infile = stdin;
@@ -526,16 +542,18 @@ int main(int argc, const char** argv)
     fprintf(stderr, "%s: must name one input and one output file\n",
 	    progname);
     usage();
+	return EXIT_FAILURE;
   }
   if ((outfile = fopen(argv[argn+1], WRITE_BINARY)) == NULL) {
     fprintf(stderr, "%s: can't open %s\n", progname, argv[argn+1]);
-    exit(EXIT_FAILURE);
+    return (EXIT_FAILURE);
   }
 #else
   /* Unix style: expect zero or one file name */
   if (argn < argc-1) {
     fprintf(stderr, "%s: only one input file\n", progname);
     usage();
+	return EXIT_FAILURE;
   }
   /* default output file is stdout */
 #ifdef USE_SETMODE		/* need to hack file mode? */
@@ -544,7 +562,7 @@ int main(int argc, const char** argv)
 #ifdef USE_FDOPEN		/* need to re-open in binary mode? */
   if ((outfile = fdopen(fileno(stdout), WRITE_BINARY)) == NULL) {
     fprintf(stderr, "%s: can't open stdout\n", progname);
-    exit(EXIT_FAILURE);
+	return (EXIT_FAILURE);
   }
 #else
   outfile = stdout;
@@ -552,20 +570,21 @@ int main(int argc, const char** argv)
 #endif /* TWO_FILE_COMMANDLINE */
 
   /* Collect comment text from comment_file or stdin, if necessary */
-  if (comment_arg == NULL) {
+  if (comment_str == NULL) {
     FILE * src_file;
     int c;
 
-    comment_arg = (char *) malloc((size_t) MAX_COM_LENGTH);
+    char *comment_arg = (char *) malloc((size_t) MAX_COM_LENGTH);
     if (comment_arg == NULL)
       ERREXIT("Insufficient memory");
+	comment_str = comment_arg;
     comment_length = 0;
     src_file = (comment_file != NULL ? comment_file : stdin);
     while ((c = getc(src_file)) != EOF) {
       if (comment_length >= (unsigned int) MAX_COM_LENGTH) {
 	fprintf(stderr, "Comment text may not exceed %u bytes\n",
 		(unsigned int) MAX_COM_LENGTH);
-	exit(EXIT_FAILURE);
+	return (EXIT_FAILURE);
       }
       comment_arg[comment_length++] = (char) c;
     }
@@ -585,7 +604,7 @@ int main(int argc, const char** argv)
     write_marker(M_COM);
     write_2_bytes(comment_length + 2);
     while (comment_length > 0) {
-      write_1_byte(*comment_arg++);
+      write_1_byte(*comment_str++);
       comment_length--;
     }
   }

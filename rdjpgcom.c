@@ -418,8 +418,6 @@ usage (void)
   fprintf(stderr, "Switches (names may be abbreviated):\n");
   fprintf(stderr, "  -raw        Display non-printable characters in comments (unsafe)\n");
   fprintf(stderr, "  -verbose    Also display dimensions of JPEG image\n");
-
-  exit(EXIT_FAILURE);
 }
 
 
@@ -481,8 +479,10 @@ int main(int argc, const char** argv)
       verbose++;
     } else if (keymatch(arg, "raw", 1)) {
       raw = 1;
-    } else
+    } else {
       usage();
+      return (EXIT_FAILURE);
+	}
   }
 
   /* Open the input file. */
@@ -490,11 +490,12 @@ int main(int argc, const char** argv)
   if (argn < argc-1) {
     fprintf(stderr, "%s: only one input file\n", progname);
     usage();
+      return (EXIT_FAILURE);
   }
   if (argn < argc) {
     if ((infile = fopen(argv[argn], READ_BINARY)) == NULL) {
       fprintf(stderr, "%s: can't open %s\n", progname, argv[argn]);
-      exit(EXIT_FAILURE);
+      return (EXIT_FAILURE);
     }
   } else {
     /* default input file is stdin */
@@ -504,7 +505,7 @@ int main(int argc, const char** argv)
 #ifdef USE_FDOPEN		/* need to re-open in binary mode? */
     if ((infile = fdopen(fileno(stdin), READ_BINARY)) == NULL) {
       fprintf(stderr, "%s: can't open stdin\n", progname);
-      exit(EXIT_FAILURE);
+      return (EXIT_FAILURE);
     }
 #else
     infile = stdin;

@@ -521,15 +521,15 @@ parse_switches (j_compress_ptr cinfo, int argc, const char **argv,
 
 int main(int argc, const char** argv)
 {
-	struct jpeg_compress_struct cinfo = { 0 };
+  struct jpeg_compress_struct cinfo = { 0 };
   struct jpeg_error_mgr jerr = { 0 };
 #ifdef PROGRESS_REPORT
-  struct cdjpeg_progress_mgr progress;
+  struct cdjpeg_progress_mgr progress = { 0 };
 #endif
   int file_index;
   cjpeg_source_ptr src_mgr = { 0 };
-  FILE * input_file;
-  FILE * output_file;
+  FILE * input_file = NULL;
+  FILE * output_file = NULL;
   JDIMENSION num_scanlines;
 
   /* On Mac, fetch a command line. */
@@ -578,6 +578,7 @@ int main(int argc, const char** argv)
       fprintf(stderr, "%s: must name one input and one output file\n",
 	      progname);
       usage();
+      return (EXIT_FAILURE);
     }
     outfilename = argv[file_index+1];
   } else {
@@ -585,6 +586,7 @@ int main(int argc, const char** argv)
       fprintf(stderr, "%s: must name one input and one output file\n",
 	      progname);
       usage();
+      return (EXIT_FAILURE);
     }
   }
 #else
@@ -592,6 +594,7 @@ int main(int argc, const char** argv)
   if (file_index < argc-1) {
     fprintf(stderr, "%s: only one input file\n", progname);
     usage();
+      return (EXIT_FAILURE);
   }
 #endif /* TWO_FILE_COMMANDLINE */
 
@@ -599,7 +602,7 @@ int main(int argc, const char** argv)
   if (file_index < argc) {
     if ((input_file = fopen(argv[file_index], READ_BINARY)) == NULL) {
       fprintf(stderr, "%s: can't open %s\n", progname, argv[file_index]);
-      exit(EXIT_FAILURE);
+      return (EXIT_FAILURE);
     }
   } else {
     /* default input file is stdin */
@@ -610,7 +613,7 @@ int main(int argc, const char** argv)
   if (outfilename != NULL) {
     if ((output_file = fopen(outfilename, WRITE_BINARY)) == NULL) {
       fprintf(stderr, "%s: can't open %s\n", progname, outfilename);
-      exit(EXIT_FAILURE);
+      return (EXIT_FAILURE);
     }
   } else {
     /* default output file is stdout */
@@ -662,6 +665,5 @@ int main(int argc, const char** argv)
 #endif
 
   /* All done. */
-  exit(jerr.num_warnings ? EXIT_WARNING : EXIT_SUCCESS);
-  return 0;			/* suppress no-return-value warnings */
+  return (jerr.num_warnings ? EXIT_WARNING : EXIT_SUCCESS);
 }
