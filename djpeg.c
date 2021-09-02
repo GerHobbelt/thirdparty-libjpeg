@@ -629,6 +629,5 @@ int main(int argc, const char** argv)
 #endif
 
   /* All done. */
-  exit(jerr.num_warnings ? EXIT_WARNING : EXIT_SUCCESS);
-  return 0;			/* suppress no-return-value warnings */
+  return(jerr.num_warnings ? EXIT_WARNING : EXIT_SUCCESS);
 }
