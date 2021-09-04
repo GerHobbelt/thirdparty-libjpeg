@@ -164,7 +164,7 @@ usage (void)
 
 
 LOCAL(int)
-parse_switches (j_decompress_ptr cinfo, int argc, const char **argv,
+parse_switches (j_decompress_ptr cinfo, int argc, const char** argv,
 		int last_file_arg_seen, boolean for_real)
 /* Parse optional switches.
  * Returns argv[] index of first file-name argument (== argc if none).
