@@ -12,6 +12,8 @@
  * is shoved onto the user.
  */
 
+#if !defined(BUILD_MONOLITHIC)
+
 #define JPEG_INTERNALS
 #include "jinclude.h"
 #include "jpeglib.h"
@@ -25,7 +27,6 @@ extern void free JPP((void *ptr));
 #ifndef SEEK_SET		/* pre-ANSI systems may not define this; */
 #define SEEK_SET  0		/* if not, assume 0 is correct */
 #endif
-
 
 /*
  * Memory allocation and freeing are controlled by the regular library
@@ -165,3 +166,5 @@ jpeg_mem_term (j_common_ptr cinfo)
 {
   /* no work */
 }
+
+#endif // !defined(BUILD_MONOLITHIC)
