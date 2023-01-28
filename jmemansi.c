@@ -12,8 +12,6 @@
  * is shoved onto the user.
  */
 
-#if !defined(BUILD_MONOLITHIC)
-
 #define JPEG_INTERNALS
 #include "jinclude.h"
 #include "jpeglib.h"
@@ -28,18 +26,19 @@ extern void free JPP((void *ptr));
 #define SEEK_SET  0		/* if not, assume 0 is correct */
 #endif
 
+
 /*
  * Memory allocation and freeing are controlled by the regular library
  * routines malloc() and free().
  */
 
-GLOBAL(void *)
+static void *
 jpeg_get_small (j_common_ptr cinfo, size_t sizeofobject)
 {
   return (void *) malloc(sizeofobject);
 }
 
-GLOBAL(void)
+static void
 jpeg_free_small (j_common_ptr cinfo, void * object, size_t sizeofobject)
 {
   free(object);
@@ -53,13 +52,13 @@ jpeg_free_small (j_common_ptr cinfo, void * object, size_t sizeofobject)
  * you probably won't be able to process useful-size images in only 64KB.
  */
 
-GLOBAL(void FAR *)
+static void FAR *
 jpeg_get_large (j_common_ptr cinfo, size_t sizeofobject)
 {
   return (void FAR *) malloc(sizeofobject);
 }
 
-GLOBAL(void)
+static void
 jpeg_free_large (j_common_ptr cinfo, void FAR * object, size_t sizeofobject)
 {
   free(object);
@@ -78,7 +77,7 @@ jpeg_free_large (j_common_ptr cinfo, void FAR * object, size_t sizeofobject)
 #define DEFAULT_MAX_MEM		1000000L /* default: one megabyte */
 #endif
 
-GLOBAL(long)
+static long
 jpeg_mem_available (j_common_ptr cinfo, long min_bytes_needed,
 		    long max_bytes_needed, long already_allocated)
 {
@@ -94,7 +93,7 @@ jpeg_mem_available (j_common_ptr cinfo, long min_bytes_needed,
  */
 
 
-METHODDEF(void)
+static void
 read_backing_store (j_common_ptr cinfo, backing_store_ptr info,
 		    void FAR * buffer_address,
 		    long file_offset, long byte_count)
@@ -107,7 +106,7 @@ read_backing_store (j_common_ptr cinfo, backing_store_ptr info,
 }
 
 
-METHODDEF(void)
+static void
 write_backing_store (j_common_ptr cinfo, backing_store_ptr info,
 		     void FAR * buffer_address,
 		     long file_offset, long byte_count)
@@ -120,7 +119,7 @@ write_backing_store (j_common_ptr cinfo, backing_store_ptr info,
 }
 
 
-METHODDEF(void)
+static void
 close_backing_store (j_common_ptr cinfo, backing_store_ptr info)
 {
   fclose(info->temp_file);
@@ -138,7 +137,7 @@ close_backing_store (j_common_ptr cinfo, backing_store_ptr info)
  * indeed, we can't even find out the actual name of the temp file.
  */
 
-GLOBAL(void)
+static void
 jpeg_open_backing_store (j_common_ptr cinfo, backing_store_ptr info,
 			 long total_bytes_needed)
 {
@@ -155,16 +154,16 @@ jpeg_open_backing_store (j_common_ptr cinfo, backing_store_ptr info,
  * cleanup required.
  */
 
-GLOBAL(long)
+static long
 jpeg_mem_init (j_common_ptr cinfo)
 {
   return DEFAULT_MAX_MEM;	/* default for max_memory_to_use */
 }
 
-GLOBAL(void)
+static void
 jpeg_mem_term (j_common_ptr cinfo)
 {
   /* no work */
 }
 
-#endif // !defined(BUILD_MONOLITHIC)
+// TODO: registration function
